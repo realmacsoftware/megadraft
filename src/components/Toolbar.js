@@ -6,7 +6,7 @@
 
 import React, {Component} from "react";
 import PropTypes from "prop-types";
-import {EditorState, RichUtils} from "draft-js";
+import {EditorState, RichUtils, Modifier} from "draft-js";
 import classNames from "classnames";
 import ToolbarItem from "./ToolbarItem";
 import {getSelectionCoords} from "../utils";
@@ -48,6 +48,13 @@ export default class Toolbar extends Component {
     );
   }
 
+  toggleBlockData(style) {
+      const data = new Map([['align', style]])
+      const newEditorState = Modifier.mergeBlockData(this.props.editorState.getCurrentContent(), this.props.editorState.getSelection(), data)
+
+      this.props.onChange(EditorState.push(this.props.editorState, newEditorState, 'paste'));
+  }
+
   toggleEntity(entity) {
     this.setState({editingEntity: entity});
   }
@@ -60,8 +67,10 @@ export default class Toolbar extends Component {
 
     switch(item.type) {
       case "custom": {
+        const {entity} = item;
         key = "custom-" + position;
         toggle = () => item.action(this.props.editorState);
+        active = this.hasEntity(entity);
         break;
       }
       case "inline": {
@@ -77,6 +86,17 @@ export default class Toolbar extends Component {
           .getBlockForKey(selection.getStartKey())
           .getType();
         toggle = () => this.toggleBlockStyle(item.style);
+        active = item.style === current;
+        break;
+      }
+      case "block-data": {
+        const selection = this.props.editorState.getSelection();
+        current = this.props.editorState
+          .getCurrentContent()
+          .getBlockForKey(selection.getStartKey())
+          .getData()
+          .get('align');
+        toggle = () => this.toggleBlockData(item.style);
         active = item.style === current;
         break;
       }
