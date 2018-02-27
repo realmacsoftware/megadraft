@@ -23,6 +23,7 @@ export default class ToolbarItem extends Component {
 
   render() {
     const Icon = this.props.item.icon;
+    const label = this.props.item.label;
 
     if (this.props.item.type == "separator") {
       return (
@@ -42,7 +43,12 @@ export default class ToolbarItem extends Component {
           }}
           type="button"
           className="toolbar__button">
-          <Icon />
+          { Icon &&
+              <Icon />
+          }
+          { !Icon &&
+              label
+          }
         </button>
       </li>
     );
