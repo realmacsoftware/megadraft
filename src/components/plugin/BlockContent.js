@@ -15,7 +15,7 @@ export default class BlockContent extends Component {
     });
 
     return (
-      <div className={className}>
+      <div className={className} {...this.props}>
         {this.props.children}
       </div>
     );
