@@ -53,7 +53,6 @@ export default class MegadraftEditor extends Component {
 
     this.handleKeyCommand = ::this.handleKeyCommand;
     this.handleReturn = ::this.handleReturn;
-    this.handlePastedText = ::this.handlePastedText;
     this.handleFocus = ::this.handleFocus;
     this.handleBlur = ::this.handleBlur;
 
@@ -241,10 +240,6 @@ export default class MegadraftEditor extends Component {
     return true;
   }
 
-  handlePastedText(text, html, editorState) {
-      return false;
-  }
-
   focus() {
     this.draftEl.focus();
   }
@@ -286,6 +281,11 @@ export default class MegadraftEditor extends Component {
   }
 
   mediaBlockRenderer(block) {
+    if (this.props.blockRendererFn) {
+        const result = this.props.blockRendererFn(block);
+        if (result) return result;
+    }
+
     if (block.getType() !== "atomic") {
       return null;
     }
@@ -349,6 +349,7 @@ export default class MegadraftEditor extends Component {
             onChange: this.onChange,
             maxSidebarButtons: this.props.maxSidebarButtons,
             modalOptions: this.props.modalOptions,
+            draft: this.draftEl,
           })}
           <Editor
             {...this.props}
@@ -360,7 +361,6 @@ export default class MegadraftEditor extends Component {
             onTab={this.onTab}
             handleKeyCommand={this.handleKeyCommand}
             handleReturn={this.props.handleReturn || this.handleReturn}
-            handlePastedText={this.props.handlePastedText || this.handlePastedText}
             keyBindingFn={this.externalKeyBindings}
             onChange={this.onChange}
           />
